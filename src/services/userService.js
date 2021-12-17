@@ -1,5 +1,6 @@
 import db from "../models/index";
 import bcrypt from 'bcryptjs';
+import { reject } from "bcrypt/promises";
 const salt = bcrypt.genSaltSync(10);
 
 let hashUserPassword = (password) => {
@@ -203,11 +204,39 @@ let updateUserData = (data)=>{
     })
 }
 
+let getAllCodeService = (typeInput)=>{
+    return new Promise (async( resolve,reject) => {
+        try {
+
+            if (!typeInput) {
+                resolve({
+                    errCode:1,
+                    errMessage:"Messing requited parameter"
+                });
+            }else{
+                let res = {};
+                let allcode = await db.Allcode.findAll({
+                    where: { type :typeInput}
+                });
+                res.errCode = 0;
+                res.errMessage="get allcode successful";
+                res.data = allcode;
+                
+                resolve(res)
+            }
+
+        } catch (e) {
+            reject(e)
+        }
+   } )
+}
+
 module.exports = {
     handleUserLogin: handleUserLogin,
     checkUserEmail: checkUserEmail,
     getAllUsers: getAllUsers,
     createNewUser:createNewUser, 
     deleteUser:deleteUser,
-    updateUserData:updateUserData
+    updateUserData:updateUserData,
+    getAllCodeService:getAllCodeService
 }
